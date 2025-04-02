@@ -1,6 +1,7 @@
 
 import { useState } from 'react';
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface VerticalSliderProps {
   value: number;
@@ -18,6 +19,7 @@ const VerticalSlider = ({
   className
 }: VerticalSliderProps) => {
   const [isDragging, setIsDragging] = useState(false);
+  const isMobile = useIsMobile();
 
   const handleSliderClick = (e: React.MouseEvent<HTMLDivElement>) => {
     const slider = e.currentTarget;
@@ -67,18 +69,25 @@ const VerticalSlider = ({
   // Calculate the position of the handle
   const fillHeight = ((value - min) / (max - min)) * 100;
 
+  // Responsive height based on screen orientation and device
+  const sliderHeight = isMobile ? "h-36" : "h-48";
+
   return (
     <div className={cn("flex flex-col items-center", className)}>
       <div className="text-sm font-semibold mb-1">High</div>
       <div
         id="vertical-slider"
-        className="relative h-48 w-8 bg-gray-200 rounded-full cursor-pointer"
+        className={`relative ${sliderHeight} w-8 bg-gray-200 rounded-full cursor-pointer`}
         onMouseDown={handleMouseDown}
         onClick={handleSliderClick}
       >
         {/* Cone shape - wide at top, narrow at bottom */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[180px] border-l-transparent border-r-transparent border-t-gray-300/30" />
+          <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[180px] border-l-transparent border-r-transparent border-t-gray-300/30" 
+               style={{ 
+                 transform: `scale(${isMobile ? 0.75 : 1})`,
+                 transformOrigin: 'top center' 
+               }} />
         </div>
         
         {/* Fill */}

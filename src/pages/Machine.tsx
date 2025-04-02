@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,11 +7,13 @@ import { useAppContext } from '@/lib/context';
 import { calculateMaxGlassesWithBattery, calculateChargingTime } from '@/lib/calculations';
 import BatteryDisplay from '@/components/BatteryDisplay';
 import VerticalSlider from '@/components/VerticalSlider';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Machine = () => {
   const navigate = useNavigate();
   const { shopId } = useParams<{ shopId: string }>();
   const { currentUser, getShopById, getMachineByShopId, updateMachine } = useAppContext();
+  const isMobile = useIsMobile();
   
   // Check if user is logged in and is a shopkeeper
   useEffect(() => {
@@ -90,7 +91,7 @@ const Machine = () => {
   
   return (
     <div className="min-h-screen bg-gray-100 py-4 px-2">
-      <div className="machine-container max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="machine-container max-w-5xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-primary text-primary-foreground p-4">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-lg font-bold">{shop.name} - Machine Control</h1>
@@ -102,89 +103,93 @@ const Machine = () => {
         </div>
         
         <div className="p-4">
-          <div className="mb-6">
-            <BatteryDisplay 
-              batteryPercentage={machine.batteryPercentage}
-              isCharging={machine.isCharging}
-              solarEfficiency={machine.solarEfficiency}
-              isPaymentMachineOn={machine.isPaymentMachineOn}
-              isLightOn={machine.isLightOn}
-              fanSpeed={machine.fanSpeed}
-            />
-          </div>
-          
-          <div className="my-6 flex justify-center">
-            <VerticalSlider 
-              value={machine.speed}
-              onChange={handleSpeedChange}
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4 mt-4">
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <SolarPanel className="h-5 w-5 text-solar" />
-                  <span>Solar Charging</span>
-                </div>
-                <Button 
-                  variant={machine.isCharging ? "default" : "outline"} 
-                  size="sm"
-                  onClick={toggleCharging}
-                >
-                  {machine.isCharging ? "ON" : "OFF"}
-                </Button>
-              </CardContent>
-            </Card>
+          <div className={`${!isMobile ? "md:flex md:gap-6" : ""}`}>
+            <div className={`${!isMobile ? "md:w-1/3" : ""} mb-6`}>
+              <BatteryDisplay 
+                batteryPercentage={machine.batteryPercentage}
+                isCharging={machine.isCharging}
+                solarEfficiency={machine.solarEfficiency}
+                isPaymentMachineOn={machine.isPaymentMachineOn}
+                isLightOn={machine.isLightOn}
+                fanSpeed={machine.fanSpeed}
+              />
+            </div>
             
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <PaymentMachine className="h-5 w-5 text-primary" />
-                  <span>Payment Machine</span>
-                </div>
-                <Button 
-                  variant={machine.isPaymentMachineOn ? "default" : "outline"} 
-                  size="sm"
-                  onClick={togglePaymentMachine}
-                >
-                  {machine.isPaymentMachineOn ? "ON" : "OFF"}
-                </Button>
-              </CardContent>
-            </Card>
+            <div className={`${!isMobile ? "md:w-1/3" : ""} my-6 flex justify-center`}>
+              <VerticalSlider 
+                value={machine.speed}
+                onChange={handleSpeedChange}
+              />
+            </div>
             
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Lightbulb className="h-5 w-5 text-solar" />
-                  <span>Light</span>
-                </div>
-                <Button 
-                  variant={machine.isLightOn ? "default" : "outline"} 
-                  size="sm"
-                  onClick={toggleLight}
-                >
-                  {machine.isLightOn ? "ON" : "OFF"}
-                </Button>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Fan className={`h-5 w-5 ${machine.fanSpeed !== 'off' ? 'animate-spin-slow text-primary' : 'text-gray-400'}`} />
-                  <span>Fan</span>
-                </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={cycleFanSpeed}
-                  className={machine.fanSpeed !== 'off' ? 'bg-primary/10' : ''}
-                >
-                  {machine.fanSpeed.toUpperCase()}
-                </Button>
-              </CardContent>
-            </Card>
+            <div className={`${!isMobile ? "md:w-1/3" : ""}`}>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <Card>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <SolarPanel className="h-5 w-5 text-solar" />
+                      <span>Solar Charging</span>
+                    </div>
+                    <Button 
+                      variant={machine.isCharging ? "default" : "outline"} 
+                      size="sm"
+                      onClick={toggleCharging}
+                    >
+                      {machine.isCharging ? "ON" : "OFF"}
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <PaymentMachine className="h-5 w-5 text-primary" />
+                      <span>Payment Machine</span>
+                    </div>
+                    <Button 
+                      variant={machine.isPaymentMachineOn ? "default" : "outline"} 
+                      size="sm"
+                      onClick={togglePaymentMachine}
+                    >
+                      {machine.isPaymentMachineOn ? "ON" : "OFF"}
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Lightbulb className="h-5 w-5 text-solar" />
+                      <span>Light</span>
+                    </div>
+                    <Button 
+                      variant={machine.isLightOn ? "default" : "outline"} 
+                      size="sm"
+                      onClick={toggleLight}
+                    >
+                      {machine.isLightOn ? "ON" : "OFF"}
+                    </Button>
+                  </CardContent>
+                </Card>
+                
+                <Card>
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Fan className={`h-5 w-5 ${machine.fanSpeed !== 'off' ? 'animate-spin-slow text-primary' : 'text-gray-400'}`} />
+                      <span>Fan</span>
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={cycleFanSpeed}
+                      className={machine.fanSpeed !== 'off' ? 'bg-primary/10' : ''}
+                    >
+                      {machine.fanSpeed.toUpperCase()}
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
           </div>
           
           <div className="mt-6">
