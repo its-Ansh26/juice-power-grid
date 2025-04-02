@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import BatteryDisplay from '@/components/BatteryDisplay';
+import MachineControl from '@/components/MachineControl';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,7 +27,6 @@ const Shopkeeper = () => {
   
   const [submittingRegistration, setSubmittingRegistration] = useState(false);
   
-  // Check if user is logged in and is a shopkeeper
   useEffect(() => {
     if (!currentUser) {
       navigate('/');
@@ -39,13 +39,10 @@ const Shopkeeper = () => {
     return null;
   }
   
-  // Find user's shop
   const userShop = shops.find(shop => shop.ownerId === currentUser.id && shop.isApproved);
   
-  // Find machine for the shop
   const machine = userShop && machines.find(m => m.shopId === userShop.id);
   
-  // Get orders for this shop
   const shopOrders = userShop 
     ? orders
         .filter(order => order.shopId === userShop.id)
@@ -68,40 +65,9 @@ const Shopkeeper = () => {
     });
   };
   
-  const toggleMachineCharging = () => {
-    if (!machine) return;
-    updateMachine(machine.id, { isCharging: !machine.isCharging });
-  };
-  
-  const togglePaymentMachine = () => {
-    if (!machine) return;
-    updateMachine(machine.id, { isPaymentMachineOn: !machine.isPaymentMachineOn });
-  };
-  
-  const toggleLight = () => {
-    if (!machine) return;
-    updateMachine(machine.id, { isLightOn: !machine.isLightOn });
-  };
-  
-  const cycleFanSpeed = () => {
-    if (!machine) return;
-    
-    const speeds: Array<'off' | 'low' | 'medium' | 'high'> = ['off', 'low', 'medium', 'high'];
-    const currentIndex = speeds.indexOf(machine.fanSpeed);
-    const nextIndex = (currentIndex + 1) % speeds.length;
-    
-    updateMachine(machine.id, { fanSpeed: speeds[nextIndex] });
-  };
-  
-  const handleMachineSpeedChange = (speed: number) => {
-    if (!machine) return;
-    updateMachine(machine.id, { speed });
-  };
-  
   const handleRegisterShop = () => {
     setSubmittingRegistration(true);
     
-    // Simulate API call
     setTimeout(() => {
       submitShopRegistration({
         shopkeeperId: currentUser.id,
@@ -119,6 +85,12 @@ const Shopkeeper = () => {
     }, 1500);
   };
   
+  const goToMachineDetails = () => {
+    if (userShop) {
+      navigate(`/machine/${userShop.id}`);
+    }
+  };
+  
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -128,13 +100,17 @@ const Shopkeeper = () => {
         
         {userShop ? (
           <div className="grid md:grid-cols-12 gap-6">
-            {/* Left column - Shop info and machine controls */}
             <div className="md:col-span-7 space-y-6">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2">
-                    <Shop className="h-5 w-5 text-primary" />
-                    {userShop.name}
+                  <CardTitle className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Shop className="h-5 w-5 text-primary" />
+                      {userShop.name}
+                    </div>
+                    <Button size="sm" onClick={goToMachineDetails}>
+                      Machine Details
+                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -147,61 +123,28 @@ const Shopkeeper = () => {
                     <div className="text-sm text-gray-500">Rating</div>
                     <div className="font-semibold">{userShop.rating}★</div>
                   </div>
-                  
-                  {machine && (
-                    <div className="border-t pt-4 mt-4">
-                      <h3 className="font-medium mb-2">Machine Controls</h3>
-                      <div className="flex flex-wrap gap-2">
-                        <Button 
-                          variant={machine.isCharging ? "default" : "outline"} 
-                          size="sm"
-                          onClick={toggleMachineCharging}
-                        >
-                          {machine.isCharging ? "Stop Charging" : "Start Charging"}
-                        </Button>
-                        
-                        <Button 
-                          variant={machine.isPaymentMachineOn ? "default" : "outline"} 
-                          size="sm"
-                          onClick={togglePaymentMachine}
-                        >
-                          {machine.isPaymentMachineOn ? "Payment Machine: ON" : "Payment Machine: OFF"}
-                        </Button>
-                        
-                        <Button 
-                          variant={machine.isLightOn ? "default" : "outline"} 
-                          size="sm"
-                          onClick={toggleLight}
-                        >
-                          {machine.isLightOn ? "Light: ON" : "Light: OFF"}
-                        </Button>
-                        
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={cycleFanSpeed}
-                        >
-                          Fan: {machine.fanSpeed.toUpperCase()}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </CardContent>
               </Card>
               
               {machine && (
-                <BatteryDisplay 
-                  batteryPercentage={machine.batteryPercentage}
-                  isCharging={machine.isCharging}
-                  solarEfficiency={machine.solarEfficiency}
-                  isPaymentMachineOn={machine.isPaymentMachineOn}
-                  isLightOn={machine.isLightOn}
-                  fanSpeed={machine.fanSpeed}
-                />
+                <>
+                  <MachineControl 
+                    machine={machine}
+                    updateMachine={updateMachine}
+                  />
+                  
+                  <BatteryDisplay 
+                    batteryPercentage={machine.batteryPercentage}
+                    isCharging={machine.isCharging}
+                    solarEfficiency={machine.solarEfficiency}
+                    isPaymentMachineOn={machine.isPaymentMachineOn}
+                    isLightOn={machine.isLightOn}
+                    fanSpeed={machine.fanSpeed}
+                  />
+                </>
               )}
             </div>
             
-            {/* Right column - Orders */}
             <div className="md:col-span-5">
               <Card className="h-full">
                 <CardHeader className="pb-2">
