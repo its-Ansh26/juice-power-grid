@@ -3,126 +3,95 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Machine } from '@/lib/types';
-import BatteryDisplay from './BatteryDisplay';
-import VerticalSlider from './VerticalSlider';
 import { Fan, Lightbulb, PaymentMachine } from './Icons';
 
 interface MachineControlProps {
   machine: Machine;
   updateMachine: (machineId: string, updates: Partial<Machine>) => void;
+  onViewDetails: () => void;
 }
 
-const MachineControl = ({ machine, updateMachine }: MachineControlProps) => {
+const MachineControl = ({ machine, updateMachine, onViewDetails }: MachineControlProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const handleSpeedChange = (speed: number) => {
-    updateMachine(machine.id, { speed });
-  };
-
-  const toggleCharging = () => {
-    updateMachine(machine.id, { isCharging: !machine.isCharging });
-  };
-
-  const togglePaymentMachine = () => {
-    updateMachine(machine.id, { isPaymentMachineOn: !machine.isPaymentMachineOn });
-  };
-
-  const toggleLight = () => {
-    updateMachine(machine.id, { isLightOn: !machine.isLightOn });
-  };
-
-  const cycleFanSpeed = () => {
-    const speeds: Array<'off' | 'low' | 'medium' | 'high'> = ['off', 'low', 'medium', 'high'];
-    const currentIndex = speeds.indexOf(machine.fanSpeed);
-    const nextIndex = (currentIndex + 1) % speeds.length;
-    
-    updateMachine(machine.id, { fanSpeed: speeds[nextIndex] });
-  };
 
   return (
     <Card className="mb-6">
       <CardHeader className="pb-2">
         <CardTitle className="flex justify-between items-center">
           <span>Machine Control</span>
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
-            {isExpanded ? "Minimize" : "Expand"}
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => setIsExpanded(!isExpanded)}
+            >
+              {isExpanded ? "Minimize" : "Expand"}
+            </Button>
+            <Button 
+              variant="default" 
+              size="sm" 
+              onClick={onViewDetails}
+            >
+              Details
+            </Button>
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
         {isExpanded ? (
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="md:w-1/3">
-              <VerticalSlider 
-                value={machine.speed} 
-                onChange={handleSpeedChange} 
-                className="mx-auto"
-              />
-            </div>
-            <div className="md:w-2/3">
-              <BatteryDisplay 
-                batteryPercentage={machine.batteryPercentage}
-                isCharging={machine.isCharging}
-                solarEfficiency={machine.solarEfficiency}
-                isPaymentMachineOn={machine.isPaymentMachineOn}
-                isLightOn={machine.isLightOn}
-                fanSpeed={machine.fanSpeed}
-              />
+          <div className="flex flex-col gap-4">
+            <div className="grid grid-cols-3 gap-3">
+              <Button 
+                variant={machine.isCharging ? "default" : "outline"} 
+                size="sm"
+                onClick={() => updateMachine(machine.id, { isCharging: !machine.isCharging })}
+                className="flex flex-col items-center py-3 h-auto"
+              >
+                <span className={`h-5 w-5 ${machine.isCharging ? 'text-primary-foreground' : 'text-primary'}`}>⚡</span>
+                <span className="mt-1 text-xs">
+                  {machine.isCharging ? "Stop Charging" : "Start Charging"}
+                </span>
+              </Button>
               
-              <div className="grid grid-cols-3 gap-3 mt-4">
-                <Button 
-                  variant={machine.isCharging ? "default" : "outline"} 
-                  size="sm"
-                  onClick={toggleCharging}
-                  className="flex flex-col items-center py-3 h-auto"
-                >
-                  <span className={`h-5 w-5 ${machine.isCharging ? 'text-primary-foreground' : 'text-primary'}`}>⚡</span>
-                  <span className="mt-1 text-xs">
-                    {machine.isCharging ? "Stop Charging" : "Start Charging"}
-                  </span>
-                </Button>
-                
-                <Button 
-                  variant={machine.isPaymentMachineOn ? "default" : "outline"} 
-                  size="sm"
-                  onClick={togglePaymentMachine}
-                  className="flex flex-col items-center py-3 h-auto"
-                >
-                  <PaymentMachine className={`h-5 w-5 ${machine.isPaymentMachineOn ? 'text-primary-foreground' : 'text-primary'}`} />
-                  <span className="mt-1 text-xs">
-                    {machine.isPaymentMachineOn ? "Payment: ON" : "Payment: OFF"}
-                  </span>
-                </Button>
-                
-                <Button 
-                  variant={machine.isLightOn ? "default" : "outline"} 
-                  size="sm"
-                  onClick={toggleLight}
-                  className="flex flex-col items-center py-3 h-auto"
-                >
-                  <Lightbulb className={`h-5 w-5 ${machine.isLightOn ? 'text-primary-foreground' : 'text-primary'}`} />
-                  <span className="mt-1 text-xs">
-                    {machine.isLightOn ? "Light: ON" : "Light: OFF"}
-                  </span>
-                </Button>
-                
-                <Button 
-                  variant={machine.fanSpeed !== 'off' ? "default" : "outline"} 
-                  size="sm"
-                  onClick={cycleFanSpeed}
-                  className="flex flex-col items-center py-3 h-auto col-start-2"
-                >
-                  <Fan className={`h-5 w-5 ${machine.fanSpeed !== 'off' ? 'text-primary-foreground animate-spin-slow' : 'text-primary'}`} />
-                  <span className="mt-1 text-xs">
-                    Fan: {machine.fanSpeed.toUpperCase()}
-                  </span>
-                </Button>
-              </div>
+              <Button 
+                variant={machine.isPaymentMachineOn ? "default" : "outline"} 
+                size="sm"
+                onClick={() => updateMachine(machine.id, { isPaymentMachineOn: !machine.isPaymentMachineOn })}
+                className="flex flex-col items-center py-3 h-auto"
+              >
+                <PaymentMachine className={`h-5 w-5 ${machine.isPaymentMachineOn ? 'text-primary-foreground' : 'text-primary'}`} />
+                <span className="mt-1 text-xs">
+                  {machine.isPaymentMachineOn ? "Payment: ON" : "Payment: OFF"}
+                </span>
+              </Button>
+              
+              <Button 
+                variant={machine.isLightOn ? "default" : "outline"} 
+                size="sm"
+                onClick={() => updateMachine(machine.id, { isLightOn: !machine.isLightOn })}
+                className="flex flex-col items-center py-3 h-auto"
+              >
+                <Lightbulb className={`h-5 w-5 ${machine.isLightOn ? 'text-primary-foreground' : 'text-primary'}`} />
+                <span className="mt-1 text-xs">
+                  {machine.isLightOn ? "Light: ON" : "Light: OFF"}
+                </span>
+              </Button>
             </div>
+
+            <Button 
+              variant={machine.fanSpeed !== 'off' ? "default" : "outline"} 
+              size="sm"
+              onClick={() => {
+                const speeds: Array<'off' | 'low' | 'medium' | 'high'> = ['off', 'low', 'medium', 'high'];
+                const currentIndex = speeds.indexOf(machine.fanSpeed);
+                const nextIndex = (currentIndex + 1) % speeds.length;
+                updateMachine(machine.id, { fanSpeed: speeds[nextIndex] });
+              }}
+              className="flex items-center justify-center py-2 w-full"
+            >
+              <Fan className={`h-5 w-5 mr-2 ${machine.fanSpeed !== 'off' ? 'text-primary-foreground animate-spin-slow' : 'text-primary'}`} />
+              <span>Fan: {machine.fanSpeed.toUpperCase()}</span>
+            </Button>
           </div>
         ) : (
           <div className="flex items-center justify-between">

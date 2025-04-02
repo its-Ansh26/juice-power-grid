@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
@@ -108,9 +109,6 @@ const Shopkeeper = () => {
                       <Shop className="h-5 w-5 text-primary" />
                       {userShop.name}
                     </div>
-                    <Button size="sm" onClick={goToMachineDetails}>
-                      Machine Details
-                    </Button>
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -131,6 +129,7 @@ const Shopkeeper = () => {
                   <MachineControl 
                     machine={machine}
                     updateMachine={updateMachine}
+                    onViewDetails={goToMachineDetails}
                   />
                   
                   <BatteryDisplay 

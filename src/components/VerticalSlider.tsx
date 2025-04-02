@@ -76,21 +76,21 @@ const VerticalSlider = ({
         onMouseDown={handleMouseDown}
         onClick={handleSliderClick}
       >
-        {/* Cone shape */}
+        {/* Cone shape - wide at top, narrow at bottom */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-b-[180px] border-l-transparent border-r-transparent border-b-gray-300/30" />
+          <div className="w-0 h-0 border-l-[16px] border-r-[16px] border-t-[180px] border-l-transparent border-r-transparent border-t-gray-300/30" />
         </div>
         
         {/* Fill */}
         <div
-          className="absolute bottom-0 left-0 right-0 bg-primary rounded-b-full transition-all"
+          className="absolute top-0 left-0 right-0 bg-primary rounded-t-full transition-all"
           style={{ height: `${fillHeight}%` }}
         />
         
         {/* Handle */}
         <div
           className="absolute left-1/2 w-6 h-6 bg-white border-2 border-primary rounded-full -translate-x-1/2 shadow-md transition-all"
-          style={{ bottom: `calc(${fillHeight}% - 12px)` }}
+          style={{ top: `calc(${100 - fillHeight}% - 12px)` }}
         />
       </div>
       <div className="text-sm font-semibold mt-1">Low</div>

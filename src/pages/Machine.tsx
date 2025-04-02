@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react';
+
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import CanonicalSlider from '@/components/CanonicalSlider';
-import BatteryDisplay from '@/components/BatteryDisplay';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Battery, Fan, Lightbulb, PaymentMachine, SolarPanel } from '@/components/Icons';
 import { useAppContext } from '@/lib/context';
 import { calculateMaxGlassesWithBattery, calculateChargingTime } from '@/lib/calculations';
+import BatteryDisplay from '@/components/BatteryDisplay';
+import VerticalSlider from '@/components/VerticalSlider';
 
 const Machine = () => {
   const navigate = useNavigate();
@@ -89,7 +90,7 @@ const Machine = () => {
   
   return (
     <div className="min-h-screen bg-gray-100 py-4 px-2">
-      <div className="machine-container bg-white rounded-lg shadow-lg overflow-hidden">
+      <div className="machine-container max-w-md mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         <div className="bg-primary text-primary-foreground p-4">
           <div className="flex justify-between items-center mb-2">
             <h1 className="text-lg font-bold">{shop.name} - Machine Control</h1>
@@ -101,20 +102,21 @@ const Machine = () => {
         </div>
         
         <div className="p-4">
-          <BatteryDisplay 
-            batteryPercentage={machine.batteryPercentage}
-            isCharging={machine.isCharging}
-            solarEfficiency={machine.solarEfficiency}
-            isPaymentMachineOn={machine.isPaymentMachineOn}
-            isLightOn={machine.isLightOn}
-            fanSpeed={machine.fanSpeed}
-          />
+          <div className="mb-6">
+            <BatteryDisplay 
+              batteryPercentage={machine.batteryPercentage}
+              isCharging={machine.isCharging}
+              solarEfficiency={machine.solarEfficiency}
+              isPaymentMachineOn={machine.isPaymentMachineOn}
+              isLightOn={machine.isLightOn}
+              fanSpeed={machine.fanSpeed}
+            />
+          </div>
           
-          <div className="my-6 flex flex-col items-center">
-            <CanonicalSlider
+          <div className="my-6 flex justify-center">
+            <VerticalSlider 
               value={machine.speed}
               onChange={handleSpeedChange}
-              label="Machine Speed"
             />
           </div>
           
